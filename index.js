@@ -44,7 +44,7 @@ const STYLES            = `
     /**************************************************************************
      * Utils
      *************************************************************************/
-    
+
     /**
      * Matches elements with the exact text value.
      */
@@ -53,7 +53,7 @@ const STYLES            = `
             return $(elem).text().match(`^${arg}$`);
         };
     });
-    
+
     /**
      * Adds commas to the given number.
      *
@@ -113,7 +113,7 @@ const STYLES            = `
     /**************************************************************************
      * Scrapers
      *************************************************************************/
-    
+
     /**
      * Scrapes all nutrient data from the page and returns an object containing the values.
      *
@@ -132,16 +132,16 @@ const STYLES            = `
 
         $tables.each((i, t) => {
             const $table  = $(t);
-        const $rows   = $table.find('tbody tr:not(.prettyTable-header)');
-        const label   = $table.find('.prettyTable-header .gwt-Label').text().trim().toLowerCase();
-        values[label] = {};
+            const $rows   = $table.find('tbody tr:not(.prettyTable-header)');
+            const label   = $table.find('.prettyTable-header .gwt-Label').text().trim().toLowerCase();
+            values[label] = {};
 
-        $rows.each((i, r) => {
-            const $row  = $(r);
-        const name  = $row.find('.gwt-HTML').text().trim().toLowerCase().replace(/\s/g, '_').replace(/-/g, '_');
-        values[label][name] = parseFloat($row.find('.gwt-Label:first').text().trim());
-    });
-    });
+            $rows.each((i, r) => {
+                const $row  = $(r);
+                const name  = $row.find('.gwt-HTML').text().trim().toLowerCase().replace(/\s/g, '_').replace(/-/g, '_');
+                values[label][name] = parseFloat($row.find('.gwt-Label:first').text().trim());
+            });
+        });
 
         return values;
     };
@@ -155,20 +155,20 @@ const STYLES            = `
         const foods = [];
         $('.diary-time').each((i, item) => {
             const $item    = $(item);
-        const label    = $item.find('+ td + td .gwt-Label:first').text().trim();
-        const amount   = $item.find('+ td + td + td .gwt-Label:first').text().trim();
-        const unit     = $item.find('+ td + td + td + td .gwt-Label:first').text().trim();
-        const calories = parseFloat($item.find('+ td + td + td + td + td .gwt-Label:first').text().trim());
-        foods.push({ label, amount, unit, calories });
-    });
+            const label    = $item.find('+ td + td .gwt-Label:first').text().trim();
+            const amount   = $item.find('+ td + td + td .gwt-Label:first').text().trim();
+            const unit     = $item.find('+ td + td + td + td .gwt-Label:first').text().trim();
+            const calories = parseFloat($item.find('+ td + td + td + td + td .gwt-Label:first').text().trim());
+            foods.push({ label, amount, unit, calories });
+        });
 
         return foods;
     };
-    
+
     /**************************************************************************
      * Modifiers
      *************************************************************************/
-    
+
     /**
      * Adds a table to the sidebar which displays fat calories and percent of total calories.
      */
@@ -246,7 +246,8 @@ const STYLES            = `
             'id':    'fats-table',
             'class': 'table-wrapper'
         });
-        htmlCreateTable('Fats', rows).appendTo($wrapper);
+        const $table = htmlCreateTable('Fats', rows).appendTo($wrapper);
+        $table.css('cursor', 'pointer').attr('title', 'Click to update').on('click', modAddFatsTable);
 
         const $existing = $('#fats-table');
         if ($existing.length > 0) {
@@ -266,13 +267,22 @@ const STYLES            = `
         $('div:textEquals("Calcium : Magnesium")').text('Magnesium : Calcium');
     };
 
-    
+    /**
+     * Moves the ratios to the top of the page.
+     */
+    const modMoveRatios = () => {
+        const $ratios = $('div:textEquals("Nutrient Balances")').parent('div:first');
+        $('#mercola-balances').replaceWith($ratios);
+    };
+
+
     /**************************************************************************
      * Start!
      *************************************************************************/
     setTimeout(() => {
         GM_addStyle(STYLES);
         modSwitchRatios();
+        modMoveRatios();
         modAddFatsTable();
         setInterval(modAddFatsTable, UPDATE_INTERVAL);
     }, READY_INTERVAL);
