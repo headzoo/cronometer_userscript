@@ -11,6 +11,12 @@
 
 /* eslint-disable no-multi-spaces */
 
+const SETTINGS = {
+    switchRatios: true,
+    moveRatios:   true,
+    addFatsTable: true
+};
+
 const FAT_CALS_PER_GRAM = 9;
 const UPDATE_INTERVAL   = 15000;
 const READY_INTERVAL    = 3000;
@@ -275,15 +281,16 @@ const STYLES            = `
         $('#mercola-balances').replaceWith($ratios);
     };
 
-
     /**************************************************************************
      * Start!
      *************************************************************************/
     setTimeout(() => {
         GM_addStyle(STYLES);
-        modSwitchRatios();
-        modMoveRatios();
-        modAddFatsTable();
-        setInterval(modAddFatsTable, UPDATE_INTERVAL);
+        if (SETTINGS.switchRatios) modSwitchRatios();
+        if (SETTINGS.moveRatios) modMoveRatios();
+        if (SETTINGS.addFatsTable) {
+            modAddFatsTable();
+            setInterval(modAddFatsTable, UPDATE_INTERVAL);
+        }
     }, READY_INTERVAL);
 })(window.jQuery);
